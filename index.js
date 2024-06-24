@@ -3,10 +3,13 @@ const { MongoClient } = require('mongodb');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
+app.use(express.urlencoded({ extended: true })); // to parse URL-encoded bodies
+app.use(express.json()); // to parse JSON bodies
 app.use(cors());
 
 const port = process.env.PORT || 5000;
@@ -42,7 +45,6 @@ app.get("/", (req, res) => {
 // Define the route to handle the GET request
 app.get('/search', async (req, res) => {
     const queryTag = req.query.tag;
-    console.log(queryTag);
     if (!queryTag) return res.status(400).send('Query parameter "tag" is required');
 
     try {
@@ -55,6 +57,22 @@ app.get('/search', async (req, res) => {
         res.status(500).send('Error fetching data');
     }
 });
+
+const genAI = new GoogleGenerativeAI("AIzaSyBULyNuooWPvrJ2Q3IEN-mPhMe1_Ttcalw");
+app.post('/chat', async (req, res) => {
+    try {
+        const { book, auth } = req.body
+        const data = `tell me details about ${book} by ${auth}`
+        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        const result = await model.generateContent(data);
+        const response = await result.response.text();
+        // console.log(response);
+        res.send(response);
+    } catch (error) {
+        res.send(error.msg)
+    }
+});
+
 // Start the server and connect to MongoDB
 connectToMongoDB().then(() => {
     app.listen(port, () => {
