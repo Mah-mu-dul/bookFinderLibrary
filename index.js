@@ -58,7 +58,7 @@ app.get('/search', async (req, res) => {
     }
 });
 
-const genAI = new GoogleGenerativeAI("AIzaSyBULyNuooWPvrJ2Q3IEN-mPhMe1_Ttcalw");
+const genAI = new GoogleGenerativeAI("AIzaSyAEf3WbMEaP6r-vD13wCxzMnZaHSQB4CC8");
 app.post('/chat', async (req, res) => {
     try {
         const { book, auth } = req.body

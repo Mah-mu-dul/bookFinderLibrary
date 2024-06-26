@@ -1,25 +1,39 @@
 import json
 import random
-import string
 
-# Helper function to generate random strings
-def random_string(length):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+# Load the real_books.json file
+with open("real_books.json", "r") as f:
+    real_books = json.load(f)
 
-# Generate the data
+# Create a new list to store the transformed data
 books = []
-for i in range(1, 501):
-    book = {
-        "id": i,
-        "bookName": f"Book Title {i}",
-        "author": f"Author {random_string(8)}",
-        "shelfNo": [f"{random.randint(10000, 99999)}-{random.randint(10, 99)}", f"{random.randint(1000, 9999)}-{random.randint(100, 999)}"]
+
+# Iterate over each book in the real_books list
+for i, book in enumerate(real_books, start=1):
+    # Extract the title from the book
+    title = book.get("title", "")
+
+    # Extract the authors from the book
+    authors = book.get("author", "")
+
+    # If authors is a string, convert it to a list
+    if isinstance(authors, str):
+        authors = [authors]
+
+    # Generate a random shelf number
+    shelf_no = f"{random.randint(10000, 99999)}-{random.randint(100, 999)}"
+
+    # Create a new book object with the desired structure
+    new_book = {
+        "_id": i,
+        "bookName": title,
+        "author": authors,  # Use the authors list
+        "shelfNo": [shelf_no],  # Use the generated shelf number
     }
-    books.append(book)
 
-# Write to a JSON file
-file_path = './books.json'
-with open(file_path, 'w') as f:
+    # Add the new book object to the books list
+    books.append(new_book)
+
+# Write the transformed data to a new JSON file called books.json
+with open("books.json", "w") as f:
     json.dump(books, f, indent=4)
-
-file_path
